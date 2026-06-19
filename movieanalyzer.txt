@@ -17,7 +17,6 @@ movie_title = ""
 imdb_rating = ""
 imdb_votes = ""
 metascore = ""
-reviews = []
 
 
 
@@ -46,7 +45,7 @@ def search_movie():
         global movie_title
         movie_title = data["Title"]
         global reviews
-        
+    
 
         tmdb_api_key = "342c42a32af831704623ebc9707cd835"
 
@@ -108,59 +107,12 @@ def show_reviews():
 🗳 IMDb Votes : {imdb_votes}
 
 🎯 Metascore : {metascore}/100
-
-📝 USER REVIEWS
-
 """
-
-    if reviews:
-
-        for i, review in enumerate(reviews[:3], start=1):
-
-            author = review.get("author", "Anonymous")
-
-            content = review.get("content", "No review available.")
-
-            rating = review.get("author_details", {}).get("rating")
-
-            if rating:
-                review_text += f"\n⭐ User Rating : {rating}/10\n"
-
-            if len(content) > 400:
-                content = content[:400] + "..."
-
-            review_text += f"""
-
-
-👤 {author}
-
-{content}
-
-"""
-
-    else:
-
-        review_text += "\nNo reviews available for this movie."
 
     info_text.delete("1.0", tk.END)
     info_text.insert(tk.END, review_text)            
 
 
-def show_trailer():
-
-    if movie_title == "":
-        messagebox.showwarning(
-            "Warning",
-            "Please search for a movie first!"
-        )
-        return
-
-    trailer_url = (
-        f"https://www.youtube.com/results?search_query="
-        f"{movie_title}+official+trailer"
-    )
-
-    webbrowser.open(trailer_url)
 
 title = tk.Label(
     root,
