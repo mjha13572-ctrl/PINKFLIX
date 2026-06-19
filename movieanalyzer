@@ -1,0 +1,286 @@
+import tkinter as tk
+from tkinter import messagebox
+import requests
+from PIL import Image, ImageTk
+import requests
+from io import BytesIO
+import webbrowser
+
+
+
+root = tk.Tk()
+root.title("PINKFLIX")
+root.geometry("1100x800")
+root.config(bg="pink")
+movie_plot = ""
+movie_title = ""
+imdb_rating = ""
+imdb_votes = ""
+metascore = ""
+
+
+
+
+def search_movie():
+
+    movie_name = entry.get()
+
+
+    api_key = "c7e986f9"
+
+    url = f"http://www.omdbapi.com/?t={movie_name}&apikey={api_key}"
+
+    response = requests.get(url)
+
+    data = response.json()
+    print(data)
+    if data["Response"]== "True":
+        title_label.config(text=f"🎬 Title: {data['Title']}")
+        year_label.config(text=f"📅 Year: {data['Year']}")
+        genre_label.config(text=f"🎭 Genre: {data['Genre']}")
+        rating_label.config(text=f"⭐ IMDb: {data['imdbRating']}")
+        global movie_plot
+        movie_plot = data.get("Plot", "Plot not available")
+        print(movie_plot)
+        global movie_title
+        movie_title = data["Title"]
+        global imdb_rating, imdb_votes, metascore
+
+        imdb_rating = data.get("imdbRating", "N/A")
+        imdb_votes = data.get("imdbVotes", "N/A")
+        metascore = data.get("Metascore", "N/A")
+
+        poster_url = data['Poster']
+        
+        image_response = requests.get(poster_url)
+        img_data = image_response.content
+        img = Image.open(BytesIO(img_data))
+        img = img.resize((180, 250))
+        poster_img = ImageTk.PhotoImage(img)
+        poster_label.config(image=poster_img)
+        poster_label.image = poster_img
+    else:
+        title_label.config(text="Movie not found")
+        return
+    
+
+def show_plot():
+    info_text.delete(1.0, tk.END)
+    info_text.insert(tk.END, movie_plot
+    )   
+
+def show_trailer():
+    if movie_title:
+        url = f"https://www.youtube.com/results?search_query={movie_title}+official+trailer+4K"
+        webbrowser.open(url)
+    else:
+        messagebox.showwarning("Warning", "Please search for a movie first!") 
+
+def show_reviews():
+
+    review_text = f"""
+⭐ IMDb Rating : {imdb_rating}/10
+
+🗳 IMDb Votes : {imdb_votes}
+
+🎯 Metascore : {metascore}/100
+"""
+
+    info_text.delete("1.0", tk.END)
+    info_text.insert(tk.END, review_text)            
+
+
+
+title = tk.Label(
+    root,
+    text="🎬 PINKFLIX",
+    font=("Impact", 32),
+    bg="black",
+    fg="hot pink"
+)
+title.pack(pady=10)
+
+subtitle = tk.Label(
+    root,
+    text="Search Any Movie Instantly",
+    font=("Arial", 12),
+    bg="black",
+    fg="white"
+)
+subtitle.pack()
+
+search_frame = tk.Frame(
+    root,
+    bg="black"
+)
+search_frame.pack(pady=20)
+
+entry = tk.Entry(
+    search_frame,
+    width=30,
+    font=("Arial", 16),
+    justify="center"
+)
+entry.grid(row=0, column=0, padx=10)
+
+
+search_button=tk.Button(
+    search_frame,
+    text="Search",
+    font=("arial",13,"bold"),
+    bg="hot pink",
+    fg="black",
+    padx=10,
+    pady=5,
+    bd=0,
+    command=search_movie
+)
+search_button.grid(row=0, column=1, padx=10)
+
+
+
+
+movie_frame = tk.Frame(
+    root,
+    bg="black",
+    width=1500,
+    height=340,
+)
+movie_frame.pack(padx=40,pady=20)
+
+movie_frame.pack_propagate(False)
+
+poster_frame = tk.Frame(
+    movie_frame,
+    bg="black",
+    width=250,
+    height=280,
+)
+
+poster_frame.grid(row=0, column=0, padx=40, pady=10)
+
+poster_frame.grid_propagate(False)
+
+poster_label = tk.Label(
+    poster_frame,
+    text="Movie Poster",
+    bg="black",
+    fg="white"
+)
+
+poster_label.place(relx=0.5, rely=0.5, anchor="center")
+
+details_frame = tk.Frame(
+    movie_frame,
+    bg="black"
+)
+
+details_frame.grid(row=0, column=1, sticky="n")
+
+title_label = tk.Label(
+    details_frame,
+    text="🎬 Title:",
+    font=("Arial", 14, "bold"),
+    bg="black",
+    fg="white"
+)
+title_label.pack(anchor="w",padx=20, pady=20)
+
+year_label = tk.Label(
+    details_frame,
+    text="📅Year:",
+    font=("Arial", 14),
+    bg="black",
+    fg="white"
+)
+year_label.pack(anchor="w",padx=20,pady=20)
+
+genre_label = tk.Label(
+    details_frame,
+    text="🎭 Genre:",
+    font=("Arial", 14),
+    bg="black",
+    fg="white"
+)
+genre_label.pack(anchor="w", padx=20,pady=20)
+
+rating_label = tk.Label(
+    details_frame,
+    text="⭐ IMDb:",
+    font=("Arial", 14),
+    bg="black",
+    fg="white"
+)
+rating_label.pack(anchor="w",padx=20, pady=20)
+
+# ================= BUTTON SECTION =================
+
+button_frame = tk.Frame(
+    root,
+    bg="pink"
+)
+
+button_frame.pack(pady=10)
+
+plot_button = tk.Button(
+    button_frame,
+    text="📝 Plot",
+    bg="hot pink",
+    fg="white",
+    font=("Arial", 11, "bold"),
+    command=show_plot
+)
+plot_button.grid(row=0, column=0, padx=10)
+
+trailer_button = tk.Button(
+    button_frame,
+    text="🎥 Trailer",
+    bg="hot pink",
+    fg="white",
+    font=("Arial", 11, "bold"),
+    command=show_trailer
+)
+trailer_button.grid(row=0, column=1, padx=10)
+
+review_button = tk.Button(
+    button_frame,
+    text="⭐ Reviews",
+    bg="hot pink",
+    fg="white",
+    font=("Arial", 11, "bold"),
+    command=show_reviews
+)
+review_button.grid(row=0, column=2, padx=10)
+
+# ================= INFO PANEL =================
+
+info_frame = tk.Frame(
+    root,
+    bg="black",
+    width=1000,
+    height=450,
+)
+
+info_frame.pack(pady=20)
+
+info_frame.pack_propagate(False)
+
+
+info_text = tk.Text(
+    info_frame,
+    bg="black",
+    fg="white",
+    font=("Arial", 12),
+    wrap="word",
+    bd=0
+)
+
+info_text.pack(fill="both", expand=True, padx=20, pady=20)
+
+info_text.insert(
+    tk.END,
+    "Movie information will be displayed here ."
+    )
+
+
+root.mainloop()
