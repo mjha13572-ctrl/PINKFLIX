@@ -79,7 +79,7 @@ def search_movie():
         image_response = requests.get(poster_url)
         img_data = image_response.content
         img = Image.open(BytesIO(img_data))
-        img = img.resize((180, 250))
+        img = img.resize((220, 300))
         poster_img = ImageTk.PhotoImage(img)
         poster_label.config(image=poster_img)
         poster_label.image = poster_img
@@ -115,7 +115,7 @@ def show_reviews():
 
     if reviews:
 
-        for i, review in enumerate(reviews[:3], start=1):
+        for i, review in enumerate(reviews[:1], start=1):
 
             author = review.get("author", "Anonymous")
 
@@ -126,8 +126,8 @@ def show_reviews():
             if rating:
                 review_text += f"\n⭐ User Rating : {rating}/10\n"
 
-            if len(content) > 400:
-                content = content[:400] + "..."
+            if len(content) > 1000:
+                content = content[:1000] + "..."
 
             review_text += f"""
 
@@ -215,17 +215,59 @@ movie_frame = tk.Frame(
     root,
     bg="black",
     width=1500,
-    height=340,
+    height=400,
 )
 movie_frame.pack(padx=40,pady=20)
 
 movie_frame.pack_propagate(False)
 
+info_frame = tk.Frame(
+    movie_frame,
+    bg="black",
+    width=600,
+    height=400,
+)
+
+info_frame.grid(row=0, column=2, padx=20, pady=10, sticky="n")
+
+info_frame.pack_propagate(False)
+
+
+info_text = tk.Text(
+    info_frame,
+    bg="black",
+    fg="white",
+    font=("Consolas", 11),
+    wrap="word",
+    bd=0
+)
+
+scrollbar = tk.Scrollbar(info_frame)
+
+scrollbar.pack(side="right", fill="y")
+
+info_text.config(yscrollcommand=scrollbar.set)
+
+scrollbar.config(command=info_text.yview)
+
+info_text.pack(
+    side="left",
+    fill="both",
+    expand=True,
+    padx=20,
+    pady=20
+)
+
+info_text.insert(
+    tk.END,
+    "Movie information will be displayed here ."
+    )
+
 poster_frame = tk.Frame(
     movie_frame,
     bg="black",
-    width=250,
-    height=280,
+    width=240,
+    height=320,
 )
 
 poster_frame.grid(row=0, column=0, padx=40, pady=10)
@@ -246,7 +288,7 @@ details_frame = tk.Frame(
     bg="black"
 )
 
-details_frame.grid(row=0, column=1, sticky="n")
+details_frame.grid(row=0, column=1, padx=15, sticky="nw")
 
 title_label = tk.Label(
     details_frame,
@@ -322,36 +364,5 @@ review_button = tk.Button(
     command=show_reviews
 )
 review_button.grid(row=0, column=2, padx=10)
-
-# ================= INFO PANEL =================
-
-info_frame = tk.Frame(
-    root,
-    bg="black",
-    width=1000,
-    height=450,
-)
-
-info_frame.pack(pady=20)
-
-info_frame.pack_propagate(False)
-
-
-info_text = tk.Text(
-    info_frame,
-    bg="black",
-    fg="white",
-    font=("Arial", 12),
-    wrap="word",
-    bd=0
-)
-
-info_text.pack(fill="both", expand=True, padx=20, pady=20)
-
-info_text.insert(
-    tk.END,
-    "Movie information will be displayed here ."
-    )
-
 
 root.mainloop()
